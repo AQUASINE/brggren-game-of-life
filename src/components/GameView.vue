@@ -3,6 +3,10 @@
 </template>
 
 <script>
+function isSizeTooSmall(val) {
+  return (window.innerWidth / val) > 50 || (window.innerHeight / val) > 30;
+}
+
 export default {
   name: "GameView",
   methods: {
@@ -146,14 +150,31 @@ export default {
     height() {
       return window.innerHeight;
     },
+
     squareSize() {
       if (this.$route.query.size) {
-        return parseInt(this.$route.query.size);
+        let squareSize = parseInt(this.$route.query.size);
+        if (squareSize < 5) {
+          squareSize = 5;
+        }
+        if (isSizeTooSmall(squareSize)) {
+          while (isSizeTooSmall(squareSize)) {
+            squareSize++;
+          }
+          console.log(`Warning: increasing square size to ${squareSize}x${squareSize} to prevent lag`);
+        }
+        return squareSize;
       }
       return 40;
     },
     type() {
-      return this.$route.query.type;
+      let type = this.$route.query.type;
+      if (type !== "berggren") {
+        document.body.style.backgroundColor = "black";
+        return "normal";
+      }
+      document.body.style.backgroundColor = "transparent";
+      return "berggren";
     }
   },
   mounted() {
